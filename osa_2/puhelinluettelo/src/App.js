@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const Filter = ({value, handleChange}) => {
   return (
@@ -38,18 +39,19 @@ const Persons = ({persons}) => {
 }
 
 const App = () => {
-  const [ persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ]) 
+  const [ persons, setPersons] = useState([]) ;
+
+  useEffect(() => {
+    axios.get("http://localhost:3001/persons")
+      .then(res => setPersons(persons.concat(res.data)))
+      .catch(console.error);
+  }, []);
 
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('');
   const [ filter, setFilter ] = useState('');
 
-  const filteredPersons = persons.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
+  const filteredPersons = persons && persons.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
 
   const addContact = (event) => {
     event.preventDefault();
