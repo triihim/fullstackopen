@@ -1,60 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import contactService from "./services/contactService";
-
-const Filter = ({value, handleChange}) => {
-  return (
-    <div>
-      filter: <input value={value} onChange={handleChange} />
-    </div>
-  );
-}
-
-const ContactForm = (props) => {
-  const name = props.name;
-  const number = props.number;
-  const handleNameChange = props.handleNameChange;
-  const handleNumberChange = props.handleNumberChange;
-  const handleSubmit = props.handleSubmit;
-  return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        name: <input value={name} onChange={handleNameChange} />
-      </div>
-      <div>
-        number: <input value={number} onChange={handleNumberChange} />
-      </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
-    </form>
-  );
-}
-
-const ContactList = ({contacts, onDelete}) => {
-  return (
-    <div>
-      {contacts.map(c => {
-        return (
-          <div key={c.id}>
-            <span>{c.name} {c.number}</span>
-            <button onClick={() => onDelete(c.id)}>Delete</button>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+import {ContactFilter, ContactForm, ContactList} from "./components/contact";
+import {NotificationType, Notification} from "./components/notification";
 
 const App = () => {
   const [ contacts, setContacts] = useState([]);
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('');
   const [ filter, setFilter ] = useState('');
+  const [ notification, setNotification] = useState({isShown: false});
+
+  const NOTIFICATION_DURATION_S = 3;
 
   const nameAlreadyExists = () => !!contacts.find(p => p.name.toLowerCase() === newName.toLowerCase());
   const nameIsProvided = () => !!newName && newName.length > 0;
   const numberIsValid = () => !!newNumber && newNumber.length > 6; // Mock constraint.
   const sortContactsByName = (c1, c2) => c2.name.toLowerCase() < c1.name.toLowerCase() ? 1 : -1;
+
+  const clearInputs = () => {
+    setNewName("");
+    setNewNumber("");
+  }
+
+  const showNotification = (type, message) => {
+    setNotification({...notification, isShown: true, type: type, message: message});
+    setTimeout(() => setNotification({...notification, isShown: false}), NOTIFICATION_DURATION_S * 1000)
+  }
 
   useEffect(() => {
     contactService.getContacts()
@@ -64,21 +35,25 @@ const App = () => {
 
   const filteredContacts = contacts && contacts.filter(c => c.name.toLowerCase().includes(filter.toLowerCase())).sort(sortContactsByName);
 
-  const createContract = () => {
+  const createContact = () => {
     contactService.createContact({name: newName, number: newNumber})
       .then(createdContact => {
         setContacts(contacts.concat(createdContact))
-        setNewName("");
-        setNewNumber("");
+        clearInputs();
+        showNotification(NotificationType.SUCCESS, `Added contact: ${createdContact.name}`);
       })
-      .catch(console.error);
+      .catch(e => showNotification(NotificationType.ERROR, "Something went wrong in contact creation"));
   }
 
   const deleteContact = id => {
-    if(window.confirm(`Delete ${contacts.find(c => c.id === id).name}?`)) {
+    const contactToDelete = contacts.find(c => c.id === id);
+    if(window.confirm(`Delete ${contactToDelete.name}?`)) {
       contactService.deleteContact(id)
-        .then(() => setContacts(contacts.filter(c => c.id !== id)))
-        .catch(console.error)
+        .then(() => {
+          setContacts(contacts.filter(c => c.id !== id));
+          showNotification(NotificationType.SUCCESS, `Deleted contact: ${contactToDelete.name}`);
+        })
+        .catch(e => showNotification(NotificationType.ERROR, `Couldn't delete ${contactToDelete.name}. Maybe the contact is already deleted`))
     }
   }
 
@@ -86,18 +61,24 @@ const App = () => {
     const existingContact = contacts.find(c => c.name.toLowerCase() === newName.toLowerCase());
     if(numberIsValid()) {
       contactService.updateNumber(existingContact.id, {name: existingContact.name, number: newNumber})
-        .then(updatedContact => setContacts(contacts.filter(c => c.id !== existingContact.id).concat(updatedContact)))
-        .catch(console.error);
+        .then(updatedContact => {
+          setContacts(contacts.filter(c => c.id !== existingContact.id).concat(updatedContact));
+          clearInputs();
+          showNotification(NotificationType.SUCCESS, `Updated the number of ${existingContact.name}`);
+        })
+        .catch(e => showNotification(NotificationType.ERROR, `Couldn't update the number of ${existingContact.name}`));
     } else {
       alert("Provide a proper number");
     }
   }
 
   const attemptContactCreation = () => {
-    if(nameAlreadyExists() && window.confirm(`${newName} is already added to the phonebook. Update existing number?`)) {
-      updateContactNumber();
+    if(nameAlreadyExists()) {
+      if(window.confirm(`${newName} is already added to the phonebook. Update existing number?`)) {
+        updateContactNumber();
+      }
     } else if(nameIsProvided() && numberIsValid()) {
-      createContract();
+      createContact();
     } else {
       alert("Please provide both the name and the number. Also, ensure the number is long enough");
     }
@@ -112,7 +93,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-        <Filter value={filter} handleChange={handleFilterChange} />
+        <Notification content={notification} />
+        <ContactFilter value={filter} handleChange={handleFilterChange} />
       <h2>Add new contact</h2>
         <ContactForm 
           name={newName} 
