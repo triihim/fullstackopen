@@ -1,8 +1,8 @@
 import React from "react";
-import {useState} from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 
-const BlogForm = ({handleCreation}) => {
+const BlogForm = ({ handleCreation }) => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
@@ -12,8 +12,8 @@ const BlogForm = ({handleCreation}) => {
     setTitle("");
     setAuthor("");
     setUrl("");
-    handleCreation({title, author, url});
-  }
+    handleCreation({ title, author, url });
+  };
 
   return (
     <div>
@@ -32,10 +32,10 @@ const BlogForm = ({handleCreation}) => {
       </form>
     </div>
   );
-}
+};
 
 BlogForm.propTypes = {
   handleCreation: PropTypes.func.isRequired
-}
+};
 
 export default BlogForm;

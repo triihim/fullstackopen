@@ -1,7 +1,7 @@
-import {useState, useEffect, useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import loginService from "./services/loginService";
 import blogService from "./services/blogService";
-import {Notification, NotificationType} from "./components/notification/notification";
+import { Notification, NotificationType } from "./components/notification/notification";
 import Togglable from "./components/togglable/togglable";
 import BlogForm from "./components/blog/blogForm";
 import BlogList from "./components/blog/blogList";
@@ -10,14 +10,14 @@ import LoginForm from "./components/login/loginForm";
 const App = () => {
   const [user, setUser] = useState(null);
   const [blogs, setBlogs] = useState([]);
-  const [notification, setNotification] = useState({isShown: false});
+  const [notification, setNotification] = useState({ isShown: false });
 
   const loginFormRef = useRef();
   const blogFormRef = useRef();
 
   const setBlogsSortedByLikes = blogsToSet => {
     setBlogs([...blogsToSet].sort((a, b) => a.likes < b.likes ? 1 : -1));
-  }
+  };
 
   useEffect(() => {
     (async () => {
@@ -28,7 +28,7 @@ const App = () => {
         showNotification(NotificationType.ERROR, "Could not fetch the blogs :(");
       }
     })();
-  }, [])
+  }, []);
 
   useEffect(() => {
     const loggedInUser = loginService.getLoggedInUser();
@@ -36,12 +36,12 @@ const App = () => {
       setUser(loggedInUser);
       blogService.setToken(loggedInUser.token);
     }
-  }, [])
+  }, []);
 
   const showNotification = (type, message) => {
-    setNotification({type, message, isShown: true});
-    setTimeout(() => setNotification({...notification, isShown: false}), 3000);
-  }
+    setNotification({ type, message, isShown: true });
+    setTimeout(() => setNotification({ ...notification, isShown: false }), 3000);
+  };
 
   const handleLogin = async (username, password) => {
     loginFormRef.current.toggleVisibility();
@@ -50,15 +50,15 @@ const App = () => {
       setUser(loginService.getLoggedInUser());
       blogService.setToken(loginService.getLoggedInUser().token);
     } catch(e) {
-      console.log(e)
+      console.log(e);
       showNotification(NotificationType.ERROR, "Invalid login credentials");
     }
-  }
+  };
 
   const handleLogout = () => {
     loginService.logout();
     setUser(null);
-  }
+  };
 
   const handleBlogCreation = async (blog) => {
     blogFormRef.current.toggleVisibility();
@@ -69,7 +69,7 @@ const App = () => {
     } catch(e) {
       showNotification(NotificationType.ERROR, "Blog creation failed");
     }
-  }
+  };
 
   const handleBlogDelete = async (blog) => {
     try {
@@ -81,7 +81,7 @@ const App = () => {
     } catch(e) {
       showNotification(NotificationType.ERROR, "Could not delete blog");
     }
-  }
+  };
 
   const handleBlogLike = async (blogId) => {
     try {
@@ -90,7 +90,7 @@ const App = () => {
     } catch(e) {
       showNotification(NotificationType.ERROR, "Could not update blog likes");
     }
-  }
+  };
 
   if(!user) {
     return (
@@ -116,7 +116,7 @@ const App = () => {
       </div>
     );
   }
-  
-}
+
+};
 
 export default App;

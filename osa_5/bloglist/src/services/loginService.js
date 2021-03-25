@@ -1,13 +1,13 @@
 import axios from "axios";
 
-const apiUrl = "http://localhost:3003/api/login"
+const apiUrl = "http://localhost:3003/api/login";
 
 const loginService = {
 
   login: async (username, password) => {
-      const response = await axios.post(apiUrl, {username, password});
-      window.localStorage.setItem("user", JSON.stringify(response.data));
-      return response.data;
+    const response = await axios.post(apiUrl, { username, password });
+    window.localStorage.setItem("user", JSON.stringify(response.data));
+    return response.data;
   },
 
   logout: () => {
@@ -18,6 +18,6 @@ const loginService = {
     return JSON.parse(window.localStorage.getItem("user"));
   }
 
-}
+};
 
 export default loginService;

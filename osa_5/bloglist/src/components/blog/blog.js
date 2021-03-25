@@ -1,25 +1,26 @@
-import {useState} from "react";
+import React from "react";
+import { useState } from "react";
 import loginService from "../../services/loginService";
 import PropTypes from "prop-types";
 
-const Blog = ({blog, handleDelete, handleLike}) => {
+const Blog = ({ blog, handleDelete, handleLike }) => {
   const [detailsShown, setDetailsShown] = useState(false);
 
   const toggleDetails = () => {
     setDetailsShown(!detailsShown);
-  }
+  };
 
   const style = {
     margin: "10px 0",
     padding: "10px",
     border: "1px solid black"
-  }
+  };
 
   const renderDeleteButton = () => {
     if(loginService.getLoggedInUser().username === blog.user.username) {
-      return <button onClick={() => handleDelete(blog)}>Remove</button>
+      return <button onClick={() => handleDelete(blog)}>Remove</button>;
     }
-  }
+  };
 
   const renderBlogDetails = () => {
     if(detailsShown) {
@@ -32,7 +33,7 @@ const Blog = ({blog, handleDelete, handleLike}) => {
         </div>
       );
     }
-  }
+  };
 
   return (
     <div style={style}>
@@ -42,7 +43,7 @@ const Blog = ({blog, handleDelete, handleLike}) => {
       {renderBlogDetails()}
     </div>
   );
-}
+};
 
 Blog.propTypes = {
   blog: PropTypes.shape({
@@ -57,6 +58,6 @@ Blog.propTypes = {
   }),
   handleDelete: PropTypes.func.isRequired,
   handleLike: PropTypes.func.isRequired
-}
+};
 
 export default Blog;
