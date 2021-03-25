@@ -8,6 +8,11 @@ router.get("/", async (req, res) => {
   return res.json(blogs);
 });
 
+router.get("/:id", async (req, res) => {
+  const blog = await Blog.findById(req.params.id).populate("user");
+  return res.json(blog);
+});
+
 router.post("/", middleware.userExtractor, async (req, res) => {
   const user = await User.findById(req.user.id);
 
@@ -40,7 +45,7 @@ router.put("/:id", async (req, res) => {
     user: blog.user
   };
 
-  const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, newContent, {new: true});
+  const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, newContent, {new: true}).populate("user");
   return res.json(updatedBlog);
 });
 
