@@ -12,7 +12,6 @@ const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [notification, setNotification] = useState({ isShown: false });
 
-  const loginFormRef = useRef();
   const blogFormRef = useRef();
 
   const setBlogsSortedByLikes = blogsToSet => {
@@ -44,7 +43,6 @@ const App = () => {
   };
 
   const handleLogin = async (username, password) => {
-    loginFormRef.current.toggleVisibility();
     try {
       await loginService.login(username, password);
       setUser(loginService.getLoggedInUser());
@@ -96,9 +94,7 @@ const App = () => {
     return (
       <div>
         {notification.isShown ? <Notification content={notification}/> : null}
-        <Togglable buttonLabel="Login" ref={loginFormRef}>
-          <LoginForm handleLogin={handleLogin} />
-        </Togglable>
+        <LoginForm handleLogin={handleLogin} />
       </div>
     );
   } else {

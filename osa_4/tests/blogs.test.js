@@ -18,7 +18,7 @@ describe("Blogs api tests", () => {
     if(!testUserExists) {
       await api.post("/api/users").send(helper.testUser).expect(201);
     } 
-
+  
     const loginResponse = await api.post("/api/login").send(helper.testUser).expect(200);
     token = loginResponse.body.token;
     done();
@@ -26,7 +26,8 @@ describe("Blogs api tests", () => {
 
   beforeEach(async () => {
     await Blog.deleteMany({});
-    const blogsToSave = helper.initialBlogs.map(b => new Blog(b));
+    const blogOwner = await User.findOne({username: "testuser"});
+    const blogsToSave = helper.initialBlogs.map(b => new Blog({...b, user: blogOwner._id}));
     const blogSavePromises = blogsToSave.map(b => b.save());
     await Promise.all(blogSavePromises);
   });

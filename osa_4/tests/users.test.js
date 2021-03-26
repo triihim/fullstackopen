@@ -9,7 +9,7 @@ const api = supertest(app);
 describe("Users api tests", () => {
 
   beforeEach(async () => {
-    await User.deleteMany({});
+    await User.deleteMany({ username: { $not: /testuser/ } });
     const usersToSave = helper.initialUsers.map(u => new User(u));
     const savePromises = usersToSave.map(u => u.save());
     await Promise.all(savePromises);
@@ -26,6 +26,8 @@ describe("Users api tests", () => {
       password: "12345"
     };
 
+    const userCountBefore = await User.count({});
+
     const result = await api.post("/api/users")
       .send(newUser)
       .expect(201)
@@ -33,8 +35,9 @@ describe("Users api tests", () => {
 
     expect(result.body.username).toEqual(newUser.username);
 
-    const usersInDb = await User.find({});
-    expect(usersInDb.length).toEqual(helper.initialUsers.length + 1);
+    const userCountAfter = await User.count({});
+
+    expect(userCountAfter).toEqual(userCountBefore + 1);
   });
 
   test("Non unique user cannot be created", async () => {

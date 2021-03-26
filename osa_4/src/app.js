@@ -20,6 +20,10 @@ app.use("/api/blogs", blogsController);
 app.use("/api/users", usersController);
 app.use("/api/login", loginController);
 
+if(process.env.NODE_ENV === "test") {
+  app.use("/api/testing", require("./controllers/test"));
+}
+
 // disable eslint for next line due to unused next and req
 // eslint-disable-next-line
 app.use((error, req, res, next) => {

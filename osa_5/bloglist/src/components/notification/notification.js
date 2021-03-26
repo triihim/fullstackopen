@@ -19,7 +19,7 @@ export const Notification = ({ content }) => {
     padding: "5px 10px"
   };
   return (
-    <div style={style}>
+    <div style={style} className="notification">
       <p>{message}</p>
     </div>
   );
