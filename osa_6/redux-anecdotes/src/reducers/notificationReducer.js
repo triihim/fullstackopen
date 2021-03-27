@@ -8,10 +8,12 @@ const hideNotification = () => {
   return { type: "HIDE" };
 }
 
+let timeoutId;
 export const setNotification = (notification, timeoutS) => {
   return async dispatch => {
     dispatch(showNotification(notification));
-    setTimeout(() => dispatch(hideNotification()), timeoutS * 1000);
+    if(timeoutId) clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => dispatch(hideNotification()), timeoutS * 1000);
   }
 }
 

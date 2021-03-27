@@ -1,10 +1,9 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { connect } from "react-redux";
 import { createAnecdote } from "../reducers/anecdoteReducer";
 import { setNotification } from "../reducers/notificationReducer";
 
-const AnecdoteForm = () => {
-  const dispatch = useDispatch()
+const AnecdoteForm = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -12,8 +11,8 @@ const AnecdoteForm = () => {
     if(!anecdote || anecdote.length < 1) {
       alert("Anecdote can't be empty")
     } else {
-      dispatch(createAnecdote(anecdote));
-      dispatch(setNotification(`Created anecdote: '${anecdote.content}'`, 10))
+      props.createAnecdote(anecdote);
+      props.setNotification(`Created anecdote: '${anecdote.content}'`, 10);
     }
   }
 
@@ -28,4 +27,4 @@ const AnecdoteForm = () => {
   );
 }
 
-export default AnecdoteForm;
+export default connect(null, { createAnecdote, setNotification })(AnecdoteForm);
