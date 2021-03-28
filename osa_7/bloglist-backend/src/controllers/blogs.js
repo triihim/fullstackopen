@@ -26,11 +26,13 @@ router.post("/", middleware.userExtractor, async (req, res) => {
 
   const blog = new Blog(blogContent);
   const createdBlog = await blog.save();
-
+  
   user.blogs = user.blogs.concat(createdBlog._id);
   user.save();
 
-  return res.status(201).json(createdBlog);
+  const populatedBlog = await Blog.findById(createdBlog._id).populate("user");
+
+  return res.status(201).json(populatedBlog);
 });
 
 router.put("/:id", async (req, res) => {

@@ -3,11 +3,25 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { createStore, applyMiddleware, combineReducers } from "redux";
+import { Provider } from "react-redux";
+import thunk from "redux-thunk";
+import notificationReducer from "./reducers/notificationReducer";
+import blogsReducer from "./reducers/blogsReducer";
+import userReducer from "./reducers/usersReducer";
+
+const reducer = combineReducers({
+  notification: notificationReducer,
+  blogs: blogsReducer,
+  users: userReducer
+});
+
+const store = createStore(reducer, applyMiddleware(thunk));
 
 ReactDOM.render(
-  <React.StrictMode>
+  <Provider store={store}>
     <App />
-  </React.StrictMode>,
+  </Provider>,
   document.getElementById("root")
 );
 

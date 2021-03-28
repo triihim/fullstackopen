@@ -1,108 +1,66 @@
-import React, { useState, useEffect, useRef } from "react";
-import loginService from "./services/loginService";
+import React, { useEffect, useRef } from "react";
 import blogService from "./services/blogService";
-import { Notification, NotificationType } from "./components/notification/notification";
+import { Notification } from "./components/notification/notification";
 import Togglable from "./components/togglable/togglable";
 import BlogForm from "./components/blog/blogForm";
 import BlogList from "./components/blog/blogList";
 import LoginForm from "./components/login/loginForm";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllBlogs, likeBlog, createBlog, deleteBlog } from "./reducers/blogsReducer";
+import { loginUser, logoutUser } from "./reducers/usersReducer";
 
 const App = () => {
-  const [user, setUser] = useState(null);
-  const [blogs, setBlogs] = useState([]);
-  const [notification, setNotification] = useState({ isShown: false });
+  const blogs = useSelector(state => [...state.blogs].sort((a, b) => a.likes < b.likes ? 1 : -1));
+  const loggedInUser = useSelector(state => state.users.loggedInUser);
+
+  const dispatch = useDispatch();
 
   const blogFormRef = useRef();
 
-  const setBlogsSortedByLikes = blogsToSet => {
-    setBlogs([...blogsToSet].sort((a, b) => a.likes < b.likes ? 1 : -1));
-  };
-
   useEffect(() => {
-    (async () => {
-      try {
-        const response = await blogService.getAll();
-        setBlogs(b => b.concat(response));
-      } catch(e) {
-        showNotification(NotificationType.ERROR, "Could not fetch the blogs :(");
-      }
-    })();
+    dispatch(getAllBlogs());
   }, []);
 
   useEffect(() => {
-    const loggedInUser = loginService.getLoggedInUser();
-    if(loggedInUser) {
-      setUser(loggedInUser);
-      blogService.setToken(loggedInUser.token);
-    }
-  }, []);
-
-  const showNotification = (type, message) => {
-    setNotification({ type, message, isShown: true });
-    setTimeout(() => setNotification({ ...notification, isShown: false }), 3000);
-  };
+    blogService.setToken(loggedInUser && loggedInUser.token);
+  }, [loggedInUser]);
 
   const handleLogin = async (username, password) => {
-    try {
-      await loginService.login(username, password);
-      setUser(loginService.getLoggedInUser());
-      blogService.setToken(loginService.getLoggedInUser().token);
-    } catch(e) {
-      console.log(e);
-      showNotification(NotificationType.ERROR, "Invalid login credentials");
-    }
+    dispatch(loginUser(username, password));
   };
 
   const handleLogout = () => {
-    loginService.logout();
-    setUser(null);
+    dispatch(logoutUser());
   };
 
-  const handleBlogCreation = async (blog) => {
+  const handleBlogCreation = (blog) => {
     blogFormRef.current.toggleVisibility();
-    try {
-      const createdBlog = await blogService.create(blog);
-      setBlogs(blogs.concat(createdBlog));
-      showNotification(NotificationType.SUCCESS, `New blog ${blog.title} added`);
-    } catch(e) {
-      showNotification(NotificationType.ERROR, "Blog creation failed");
-    }
+    dispatch(createBlog(blog));
   };
 
-  const handleBlogDelete = async (blog) => {
-    try {
-      if(window.confirm(`Are you sure you want to delete blog: ${blog.title}?`)) {
-        await blogService.delete(blog.id);
-        setBlogsSortedByLikes(blogs.filter(b => b.id !== blog.id));
-        showNotification(NotificationType.SUCCESS, `Blog ${blog.title} deleted`);
-      }
-    } catch(e) {
-      showNotification(NotificationType.ERROR, "Could not delete blog");
+  const handleBlogDelete = (blog) => {
+    if(window.confirm(`Are you sure you want to delete blog: ${blog.title}?`)) {
+      dispatch(deleteBlog(blog.id));
     }
   };
 
   const handleBlogLike = async (blogId) => {
-    try {
-      const likedBlog = await blogService.like(blogId);
-      setBlogsSortedByLikes(blogs.filter(b => b.id !== blogId).concat(likedBlog));
-    } catch(e) {
-      showNotification(NotificationType.ERROR, "Could not update blog likes");
-    }
+    dispatch(likeBlog(blogId));
   };
 
-  if(!user) {
+  if(!loggedInUser) {
     return (
       <div>
-        {notification.isShown ? <Notification content={notification}/> : null}
+        <Notification />
         <LoginForm handleLogin={handleLogin} />
       </div>
     );
   } else {
     return (
       <div>
+        <Notification />
         <div>
-          {notification.isShown ? <Notification content={notification}/> : null}
-          {user.name} logged in
+          {loggedInUser.name} logged in
           <button onClick={handleLogout}>Logout</button>
         </div>
         <Togglable buttonLabel="New blog" ref={blogFormRef}>

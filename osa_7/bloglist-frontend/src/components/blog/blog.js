@@ -1,10 +1,11 @@
 import React from "react";
 import { useState } from "react";
-import loginService from "../../services/loginService";
 import PropTypes from "prop-types";
+import { useSelector } from "react-redux";
 
 const Blog = ({ blog, handleDelete, handleLike }) => {
   const [detailsShown, setDetailsShown] = useState(false);
+  const canDelete = useSelector(state => state.users.loggedInUser.name === blog.user.name);
 
   const toggleDetails = () => {
     setDetailsShown(!detailsShown);
@@ -17,7 +18,7 @@ const Blog = ({ blog, handleDelete, handleLike }) => {
   };
 
   const renderDeleteButton = () => {
-    if(loginService.getLoggedInUser().username === blog.user.username) {
+    if(canDelete) {
       return <button onClick={() => handleDelete(blog)}>Remove</button>;
     }
   };

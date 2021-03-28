@@ -14,10 +14,6 @@ const loginService = {
     window.localStorage.removeItem("user");
   },
 
-  getLoggedInUser: () => {
-    return JSON.parse(window.localStorage.getItem("user"));
-  }
-
 };
 
 export default loginService;
