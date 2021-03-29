@@ -9,6 +9,7 @@ import thunk from "redux-thunk";
 import notificationReducer from "./reducers/notificationReducer";
 import blogsReducer from "./reducers/blogsReducer";
 import userReducer from "./reducers/usersReducer";
+import { BrowserRouter as Router } from "react-router-dom";
 
 const reducer = combineReducers({
   notification: notificationReducer,
@@ -19,9 +20,11 @@ const reducer = combineReducers({
 const store = createStore(reducer, applyMiddleware(thunk));
 
 ReactDOM.render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
+  <Router>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </Router>,
   document.getElementById("root")
 );
 

@@ -1,21 +1,32 @@
 import React from "react";
-import Blog from "./blog";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
+import { Typography } from "@material-ui/core";
 
-const BlogList = ({ blogs, handleDelete, handleLike }) => {
+const BlogList = ({ blogs }) => {
+
+  const titleStyle = {
+    margin: "20px 0"
+  };
+
+  const blogLinkStyle = {
+    textDecoration: "none",
+    color: "#333"
+  };
+
   return blogs.map(b => {
     return (
       <div key={b.id}>
-        <Blog blog={b} handleDelete={handleDelete} handleLike={handleLike} />
+        <Typography variant="h6" style={titleStyle}>
+          <Link to={`/blogs/${b.id}`} style={blogLinkStyle}>{b.title}</Link>
+        </Typography>
       </div>
     );
   });
 };
 
 BlogList.propTypes = {
-  blogs: PropTypes.arrayOf(PropTypes.object),
-  handleDelete: PropTypes.func.isRequired,
-  handleLike: PropTypes.func.isRequired
+  blogs: PropTypes.arrayOf(PropTypes.object)
 };
 
 export default BlogList;

@@ -11,7 +11,7 @@ const isValidUserData = ({ username, name, password }) => {
 };
 
 router.get("/", async (req, res) => {
-  const users = await User.find({}).populate("Blogs");
+  const users = await User.find({}).populate("blogs");
   return res.json(users);
 });
 

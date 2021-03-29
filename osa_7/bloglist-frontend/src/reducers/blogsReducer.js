@@ -19,9 +19,9 @@ export const createBlog = blog => {
         type: "BLOG_CREATE",
         blog: createdBlog
       });
-      setSuccessNotification(`Blog ${createdBlog.title} created`);
+      dispatch(setSuccessNotification(`Blog ${createdBlog.title} created`));
     } catch(e) {
-      setErrorNotification("Blog creation failed");
+      dispatch(setErrorNotification("Blog creation failed"));
     }
   };
 };
@@ -35,12 +35,12 @@ export const likeBlog = blogId => {
         blog: likedBlog
       });
     } catch (e) {
-      setErrorNotification("Could not like the blog");
+      dispatch(setErrorNotification("Could not like the blog"));
     }
   };
 };
 
-export const deleteBlog = blogId => {
+export const deleteBlog = (blogId, callback) => {
   return async dispatch => {
     try {
       await blogService.delete(blogId);
@@ -48,8 +48,25 @@ export const deleteBlog = blogId => {
         type: "BLOG_DELETE",
         blogId
       });
+      dispatch(setSuccessNotification("Blog removed"));
+      if(callback) callback();
     } catch (e) {
-      setErrorNotification("Could not delete the blog");
+      dispatch(setErrorNotification("Could not delete the blog"));
+    }
+  };
+};
+
+export const commentBlog = (blogId, comment) => {
+  return async dispatch => {
+    try {
+      const commentedBlog = await blogService.comment(blogId, comment);
+      dispatch({
+        type: "BLOG_COMMENT",
+        blog: commentedBlog
+      });
+      dispatch(setSuccessNotification("Comment posted"));
+    } catch (e) {
+      dispatch(setErrorNotification("Could not comment the blog"));
     }
   };
 };
@@ -60,6 +77,7 @@ const blogsReducer = (state = [], action) => {
     case "BLOG_CREATE": return state.concat(action.blog);
     case "BLOG_LIKE": return state.filter(b => b.id !== action.blog.id).concat(action.blog);
     case "BLOG_DELETE": return state.filter(b => b.id !== action.blogId);
+    case "BLOG_COMMENT": return state.filter(b => b.id !== action.blog.id).concat(action.blog);
     default: return state;
   }
 };

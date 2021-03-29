@@ -62,4 +62,12 @@ router.delete("/:id", middleware.userExtractor, async (req, res) => {
   return res.sendStatus(204);
 });
 
+router.post("/:id/comments", middleware.userExtractor, async (req, res) => {
+  const blog = await Blog.findById(req.params.id);
+  blog.comments.push({ comment: req.body.comment });
+  await blog.save();
+  await blog.execPopulate("user");
+  return res.json(blog);
+});
+
 module.exports = router;

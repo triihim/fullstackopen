@@ -14,6 +14,17 @@ const loginService = {
     window.localStorage.removeItem("user");
   },
 
+  getLoggedInUser: () => {
+    const stored = window.localStorage.getItem("user");
+    if(stored) {
+      const user = JSON.parse(stored);
+      const valid = user.token && user.username && user.name;
+      if(!valid) throw Error("No valid logged in user");
+      return user;
+    }
+    return null;
+  }
+
 };
 
 export default loginService;

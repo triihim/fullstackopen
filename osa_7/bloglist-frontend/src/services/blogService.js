@@ -28,6 +28,11 @@ const blogService = {
 
   delete: async (blogId) => {
     await axios.delete(`${apiUrl}/${blogId}`, { headers: { Authorization: token_ } });
+  },
+
+  comment: async (blogId, comment) => {
+    const response = await axios.post(`${apiUrl}/${blogId}/comments`, { comment }, { headers: { Authorization: token_ } });
+    return response.data; // Commented blog.
   }
 };
 
