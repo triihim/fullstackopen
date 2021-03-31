@@ -5,6 +5,7 @@ const Book = require("./schemas/book");
 const Author = require("./schemas/author");
 const User = require("./schemas/user");
 const jwt = require("jsonwebtoken");
+const book = require("./schemas/book");
 
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true });
 process.on("SIGINT", function() {
@@ -45,6 +46,7 @@ const typeDefs = gql`
     authorCount: Int!
     allBooks(author: String, genre: String): [Book]!
     allAuthors: [Author]!
+    allGenres: [String]!
     me: User
   }
 
@@ -82,10 +84,27 @@ const resolvers = {
     allAuthors: () => Author.find({}),
 
     allBooks: async (root, args) => {
-      const filter = {};
-      if(args.author) filter.author = args.author;
-      if(args.genre) filter.genre = args.genre;
-      return Book.find(filter).populate("author");
+      let books = await Book.find().populate("author");
+      if(args.author) {
+        books = books.filter(b => b.author.name === args.author);
+      }
+      if(args.genre) {
+        books = books.filter(b => b.genres.includes(args.genre));
+      }
+      return books;
+    },
+
+    allGenres: async (root, args) => {
+      const books = await Book.find({});
+      const genres = new Set();
+      books.forEach(book => {
+        book.genres.forEach(g => {
+          if(g.length) {
+            genres.add(g);
+          }
+        });
+      });
+      return genres;
     },
 
     me: (root, args, context) => context.currentUser
@@ -106,7 +125,7 @@ const resolvers = {
       } catch(e) {
         throw new UserInputError(e.message, { invalidArgs: args });
       }
-      return book;
+      return book.execPopulate("author");
     },
 
     editAuthor: async (root, args, { currentUser }) => {

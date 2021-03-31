@@ -15,16 +15,21 @@ const Authors = (props) => {
     return <p>Loading ...</p>
   }
 
-  const authors = result.data.authors;
+  const authors = result && result.data && result.data.authors;
 
   const handleBirthyearSubmit = e => {
     e.preventDefault();
-    updateAuthorBirthyear({ 
-      variables: {
-        name: e.target.name.value,
-        birthyear: +e.target.birthyear.value
-      }
-    })
+    const birthyear = e.target.birthyear.value;
+    if(!birthyear.length) {
+      alert("Birthyear is required");
+    } else {
+      updateAuthorBirthyear({ 
+        variables: {
+          name: e.target.name.value,
+          birthyear: +birthyear
+        }
+      })
+    }
   }
 
   return (
@@ -41,7 +46,7 @@ const Authors = (props) => {
               books
             </th>
           </tr>
-          {authors.map(a =>
+          {authors && authors.map(a =>
             <tr key={a.name}>
               <td>{a.name}</td>
               <td>{a.born}</td>
@@ -50,19 +55,21 @@ const Authors = (props) => {
           )}
         </tbody>
       </table>
+      <div style={{ display: props.userCanEdit ? "block" : "none" }}>
       <h3>Set birthyear</h3>
-      <form onSubmit={handleBirthyearSubmit}>
-        <div>
-          Name:
-          <select name="name">
-            {authors.map(a => <option key={a.id} value={a.name}>{a.name}</option>)}
-          </select>
-        </div>
-        <div>
-          Born: <input name="birthyear" type="number" />
-        </div>
-        <button type="submit">Update author</button>
-      </form>
+        <form onSubmit={handleBirthyearSubmit}>
+          <div>
+            Name:
+            <select name="name">
+              {authors && authors.map(a => <option key={a.id} value={a.name}>{a.name}</option>)}
+            </select>
+          </div>
+          <div>
+            Born: <input name="birthyear" type="number" />
+          </div>
+          <button type="submit">Update author</button>
+        </form>
+      </div>
     </div>
   )
 }
