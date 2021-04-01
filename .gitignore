@@ -3,3 +3,4 @@ node_modules
 .vscode
 videos
 .env
+build

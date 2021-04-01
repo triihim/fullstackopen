@@ -1,0 +1,16 @@
+// Get all
+GET http://localhost:3001/api/patients
+
+###
+
+// Create new
+POST http://localhost:3001/api/patients
+Content-Type: application/json
+
+{
+  "name": "Bob",
+  "dateOfBirth": "2021-04-01T16:42:15.764Z",
+  "ssn": "12345",
+  "gender": "male",
+  "occupation": "builder"
+}
