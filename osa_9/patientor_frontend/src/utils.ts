@@ -1,0 +1,1 @@
+export const assertNever = (arg: never): never => { throw new Error(`Unhandled arg: ${arg}`); }; // eslint-disable-line
