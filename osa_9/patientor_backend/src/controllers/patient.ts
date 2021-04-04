@@ -29,7 +29,8 @@ router.get("/:id", (req, res) => {
 router.post("/:id/entries", (req, res) => {
   try {
     const newEntry = toNewEntry(req.body);
-    return service.createEntry(req.params.id, newEntry);
+    const createdEntry = service.createEntry(req.params.id, newEntry);
+    return res.status(201).json(createdEntry);
   } catch(e) {
     return res.status(400).json({ error: (e as Error).message });
   }

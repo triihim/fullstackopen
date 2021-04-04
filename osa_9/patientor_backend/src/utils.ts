@@ -74,7 +74,7 @@ interface EntryFields {
   date: unknown,
   specialist: unknown,
   diagnosisCodes?: unknown,
-  HealthCheckRating?: unknown,
+  healthCheckRating?: unknown,
   employerName?: unknown,
   discharge?: { 
     date: unknown, 
@@ -126,7 +126,7 @@ const parseHealthCheckEntry = (entry: EntryFields): NewHealthCheckEntry => {
     type: EntryType.HealthCheck,
     description: parseDescription(entry.description),
     date: parseDate(entry.date),
-    healthCheckRating: parseHealthCheckRating(entry.HealthCheckRating),
+    healthCheckRating: parseHealthCheckRating(entry.healthCheckRating),
     specialist: parseSpecialist(entry.specialist)
   };
 

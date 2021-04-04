@@ -1,8 +1,7 @@
 import React from "react";
-import { Entry, HealthCheckEntry, HealthCheckRating, HospitalEntry, OccupationalHealthCareEntry, Diagnosis } from "../types";
+import { Entry, HealthCheckEntry, HealthCheckRating, HospitalEntry, OccupationalHealthCareEntry, Diagnosis, EntryType } from "../types";
 import { assertNever } from "../utils";
-import { Segment, Icon } from "semantic-ui-react";
-import { SemanticCOLORS } from "semantic-ui-react/dist/commonjs/generic";
+import { Segment, Icon, SemanticCOLORS } from "semantic-ui-react";
 import { useStateValue } from "../state";
 
 interface EntryDetailsProps { entry: Entry }
@@ -60,11 +59,11 @@ const EntryDetails = ({ entry }: EntryDetailsProps) => {
       </Segment>
     );
   };
-  
+
   switch(entry.type) {
-    case "HealthCheck": return healthCheck(entry);
-    case "Hospital": return hospital(entry);
-    case "OccupationalHealthcare": return occupationalHealthcare(entry);
+    case EntryType.HealthCheck: return healthCheck(entry);
+    case EntryType.Hospital: return hospital(entry);
+    case EntryType.OccupationalHealthcare: return occupationalHealthcare(entry);
     default: return assertNever(entry);
   }
 };
